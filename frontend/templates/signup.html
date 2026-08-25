@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up · CivicConnect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #3b82f6;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gray-soft: #f1f5f9;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-md: 0 20px 30px -12px rgba(0,0,0,0.1);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f8 0%, #f8fafc 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* main card – glassmorphic */
+        .signup-card {
+            display: flex;
+            width: 100%;
+            max-width: 1120px;
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        /* LEFT panel – brand & info (same gradient as login) */
+        .brand-panel {
+            flex: 1;
+            background: linear-gradient(145deg, var(--primary) 0%, var(--primary-soft) 100%);
+            color: white;
+            padding: 2.8rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.12);
+            padding: 0.5rem 1.5rem 0.5rem 1.2rem;
+            border-radius: 60px;
+            width: fit-content;
+            backdrop-filter: blur(2px);
+        }
+        .logo i { font-size: 2rem; }
+
+        .brand-panel h1 {
+            font-size: clamp(1.8rem, 4vw, 2.3rem);
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+        .brand-panel .subhead {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .info-list {
+            list-style: none;
+            margin-top: 2rem;
+        }
+        .info-list li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 1.2rem;
+            font-size: 0.95rem;
+            background: rgba(255,255,255,0.08);
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            backdrop-filter: blur(2px);
+        }
+        .info-list i {
+            font-size: 1.2rem;
+            width: 28px;
+        }
+
+        /* RIGHT panel – form */
+        .form-panel {
+            flex: 1;
+            padding: 2.5rem 2.8rem;
+            background: white;
+        }
+
+        .form-header {
+            margin-bottom: 1.8rem;
+        }
+        .form-header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+        .form-header p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 180px;
+            margin-bottom: 1.2rem;
+        }
+        .form-group.full-width {
+            flex: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark);
+            letter-spacing: 0.01em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            background: var(--gray-soft);
+            transition: all 0.2s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+        }
+        select.form-control {
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.75rem;
+            margin-top: 0.4rem;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+        .error-msg i {
+            font-size: 0.7rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 14px rgba(37,99,235,0.25);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -8px var(--primary);
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.8rem;
+            gap: 1rem;
+        }
+        .login-link {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: 0.15s;
+            border-bottom: 1px solid transparent;
+        }
+        .login-link:hover {
+            border-bottom-color: var(--primary);
+        }
+
+        .divider {
+            margin: 1.2rem 0 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 850px) {
+            .signup-card {
+                flex-direction: column;
+                border-radius: var(--radius-lg);
+            }
+            .brand-panel {
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                padding: 2rem;
+            }
+            .form-panel {
+                padding: 2rem;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+        @media (max-width: 480px) {
+            body { padding: 1rem; }
+            .form-panel { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-card">
+        <!-- left panel : brand & value -->
+        <div class="brand-panel">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <span>CivicConnect</span>
+            </div>
+            <h1>Join the movement</h1>
+            <p class="subhead">Report civic issues, track real‑time progress, and contribute to a cleaner, safer community.</p>
+            <ul class="info-list">
+                <li><i class="fas fa-flag-checkered"></i> <span>File complaints with photos & location</span></li>
+                <li><i class="fas fa-chart-line"></i> <span>Track status & department updates</span></li>
+                <li><i class="fas fa-shield-alt"></i> <span>Secure, verified citizen accounts</span></li>
+                <li><i class="fas fa-map-pin"></i> <span>Local coverage: Puttur region</span></li>
+            </ul>
+        </div>
+
+        <!-- right panel : signup form -->
+        <div class="form-panel">
+            <div class="form-header">
+                <h2>Create account</h2>
+                <p>Start reporting issues in your neighborhood</p>
+            </div>
+
+            <form id="signupForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-user" style="margin-right:6px;"></i> Full name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="name" class="form-control" placeholder="e.g., Rahul Sharma" autocomplete="name">
+                        </div>
+                        <div class="error-msg" id="name-error"><i class="fas fa-exclamation-circle"></i> Full name required</div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="email" class="form-control" placeholder="you@example.com" autocomplete="email">
+                        </div>
+                        <div class="error-msg" id="email-error"><i class="fas fa-exclamation-circle"></i> Valid email required</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-phone-alt"></i> Phone number</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone-alt input-icon"></i>
+                            <input type="tel" id="phone" class="form-control" placeholder="+91 9876543210" autocomplete="tel">
+                        </div>
+                        <div class="error-msg" id="phone-error"><i class="fas fa-exclamation-circle"></i> 10-digit or +91 format</div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Select area (Puttur)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-location-dot input-icon"></i>
+                    <select id="location" class="form-control">
+                        <option value="">-- Choose your locality --</option>
+
+                        <!-- 574201 -->
+                        <option value="574201">Puttur Town</option>
+                        <option value="574201">Main Market</option>
+                        <option value="574201">Bus Stand Area</option>
+
+                        <!-- 574202 -->
+                        <option value="574202">Kabaka</option>
+                        <option value="574202">Bannur</option>
+
+                        <!-- 574203 -->
+                        <option value="574203">Bolwar</option>
+                        <option value="574203">Nehru Nagar</option>
+
+                        <!-- 574200 -->
+                        <option value="574200">Darbe</option>
+                        <option value="574200">Keyyur</option>
+                    </select>
+                        </div>
+                        <div class="error-msg" id="location-error"><i class="fas fa-exclamation-circle"></i> Please select your area</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="password" class="form-control" placeholder="Min. 6 characters">
+                        </div>
+                        <div class="error-msg" id="password-error"><i class="fas fa-exclamation-circle"></i> At least 6 characters</div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-circle"></i> Confirm password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-check-circle input-icon"></i>
+                            <input type="password" id="confirm" class="form-control" placeholder="Re-type password">
+                        </div>
+                        <div class="error-msg" id="confirm-error"><i class="fas fa-exclamation-circle"></i> Passwords do not match</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label><i class="fas fa-qrcode"></i> PIN Code (auto‑filled)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-map-pin input-icon"></i>
+                            <input type="text" id="pincode" class="form-control" placeholder="Will appear after area selection" readonly>
+                        </div>
+                        <div class="error-msg" id="pincode-error"><i class="fas fa-exclamation-circle"></i> PIN code must be from allowed region</div>
+                    </div>
+                </div>
+
+                <div class="action-row">
+                    <button type="submit" class="btn-primary"><i class="fas fa-user-plus"></i> Create account</button>
+                    <a href="/login" class="login-link"><i class="fas fa-sign-in-alt"></i> Already have an account? Login</a>
+                </div>
+                <div class="divider">— CivicConnect, transparent governance —</div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Allowed PIN codes for Puttur region (exactly as per backend constraints)
+        const ALLOWED_PINCODES = ['574201','574202','574203','574200'];
+
+        // Helper: email validation
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Phone validation (supports +91XXXXXXXXXX or 10 digits)
+        function validatePhone(phoneRaw) {
+            const cleaned = phoneRaw.replace(/[\s\-]/g, '');
+            return /^(\+91[0-9]{10}|[0-9]{10})$/.test(cleaned);
+        }
+
+        // Auto-fill pincode based on area selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const locationSelect = document.getElementById('location');
+            const pincodeInput = document.getElementById('pincode');
+
+            if (locationSelect && pincodeInput) {
+                locationSelect.addEventListener('change', function() {
+                    const selectedPin = locationSelect.value;
+                    pincodeInput.value = selectedPin;
+                    
+                    // clear errors when user selects
+                    const locError = document.getElementById('location-error');
+                    const pinError = document.getElementById('pincode-error');
+                    if (locError) locError.style.display = 'none';
+                    if (pinError && selectedPin) pinError.style.display = 'none';
+                    
+                    // if selectedPin is not empty but invalid, show pin error instantly
+                    if (selectedPin && !ALLOWED_PINCODES.includes(selectedPin)) {
+                        if (pinError) {
+                            pinError.innerHTML = '<i class="fas fa-exclamation-circle"></i> This area is currently not supported for reporting.';
+                            pinError.style.display = 'flex';
+                        }
+                    }
+                });
+            }
+        });
+
+        // Form submission handler (preserves exact backend logic)
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Gather values
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phoneRaw = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPw = document.getElementById('confirm').value;
+            const locationVal = document.getElementById('location').value;
+            const pincode = document.getElementById('pincode').value.trim();
+
+            // Reset all errors
+            const errorIds = ['name-error','email-error','phone-error','password-error','confirm-error','location-error','pincode-error'];
+            errorIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+
+            let isValid = true;
+
+            // validation
+            if (!name) {
+                document.getElementById('name-error').style.display = 'flex';
+                isValid = false;
+            }
+            if (!validateEmail(email)) {
+                document.getElementById('email-error').style.display = 'flex';
+                isValid = false;
+            }
+            if (!validatePhone(phoneRaw)) {
+                document.getElementById('phone-error').style.display = 'flex';
+                isValid = false;
+            }
+            if (password.length < 6) {
+                document.getElementById('password-error').style.display = 'flex';
+                isValid = false;
+            }
+            if (password !== confirmPw) {
+                document.getElementById('confirm-error').style.display = 'flex';
+                isValid = false;
+            }
+            if (!locationVal) {
+                document.getElementById('location-error').style.display = 'flex';
+                isValid = false;
+            }
+            if (!/^[0-9]{6}$/.test(pincode)) {
+                const pinErr = document.getElementById('pincode-error');
+                pinErr.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter a valid 6-digit PIN';
+                pinErr.style.display = 'flex';
+                isValid = false;
+            } else if (!ALLOWED_PINCODES.includes(pincode)) {
+                const pinErr = document.getElementById('pincode-error');
+                pinErr.innerHTML = '<i class="fas fa-exclamation-circle"></i> Reporting is limited to specific Puttur PIN codes. Please select a valid area.';
+                pinErr.style.display = 'flex';
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Prepare form data for backend (exactly as original)
+            let formData = new FormData();
+            formData.append("name", name);
+            formData.append("email", email);
+            formData.append("phone", phoneRaw);
+            formData.append("password", password);
+            formData.append("pincode", pincode);
+
+            // Disable button to avoid double submit
+            const submitBtn = document.querySelector('.btn-primary');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Creating...';
+            submitBtn.disabled = true;
+
+            fetch("/signup", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Save user session (citizen)
+                    localStorage.setItem("cc_user_logged_in", "true");
+                    localStorage.setItem("cc_user_email", email);
+                    localStorage.setItem("cc_user_role", "citizen");
+                    localStorage.setItem("cc_user_pincode", pincode);
+                    localStorage.setItem("cc_user_name", name);
+                    localStorage.setItem("cc_user_phone", phoneRaw);
+                    
+                    alert("✅ Account created successfully! Welcome to CivicConnect.");
+                    window.location.href = "/";
+                } else {
+                    alert(data.message || "Signup failed. Email may already exist.");
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error("Signup error:", err);
+                alert("⚠️ Could not connect to server. Please try again.");
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

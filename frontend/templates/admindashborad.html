@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard · CivicConnect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #3b82f6;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gray-soft: #f1f5f9;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: #f1f5f9;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 20px rgba(0,0,0,0.08);
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #f8fafc 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            transition: all 0.3s;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+        }
+
+        .sidebar-header {
+            padding: 1.8rem 1.5rem;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-header .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .sidebar-header i {
+            font-size: 1.8rem;
+            color: var(--primary-soft);
+        }
+
+        .department-info {
+            background: rgba(255,255,255,0.08);
+            margin: 1.2rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+        }
+        .department-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        .department-role {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0.8rem 1.5rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .menu-item:hover, .menu-item.active {
+            background: #334155;
+            border-left: 3px solid var(--primary);
+        }
+        .menu-item i {
+            width: 24px;
+            text-align: center;
+        }
+        .menu-divider {
+            height: 1px;
+            background: #334155;
+            margin: 1rem 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 1.8rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 0.4rem 1.2rem 0.4rem 0.8rem;
+            border-radius: 60px;
+            box-shadow: var(--shadow-sm);
+        }
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+            border-radius: 30px;
+        }
+
+        /* Stats Cards */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+        }
+        .stat-icon.garbage { background: rgba(16,185,129,0.1); color: var(--success); }
+        .stat-icon.roads { background: rgba(245,158,11,0.1); color: var(--warning); }
+        .stat-number { font-size: 2rem; font-weight: 800; }
+        .stat-label { color: var(--gray); font-size: 0.85rem; margin-top: 0.2rem; }
+
+        /* Section Cards */
+        .complaints-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        .section-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .filter-select {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 40px;
+            background: white;
+            font-weight: 500;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+        .complaints-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .complaints-table th {
+            text-align: left;
+            padding: 1rem;
+            background: var(--gray-soft);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--dark);
+        }
+        .complaints-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        .complaints-table tr:hover {
+            background: var(--gray-soft);
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            max-width: 900px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        .modal-header h2 { font-size: 1.4rem; }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        .modal-body { padding: 1.5rem; }
+        .complaint-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .complaint-image {
+            width: 100%;
+            border-radius: var(--radius-sm);
+            max-height: 220px;
+            object-fit: cover;
+        }
+        .detail-group { margin-bottom: 1.2rem; }
+        .detail-label { font-weight: 700; margin-bottom: 0.3rem; color: var(--dark); }
+        .detail-value { color: var(--gray); }
+        .ai-detection {
+            background: rgba(37,99,235,0.08);
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .menu-text, .sidebar .department-info, .sidebar .logo-text { display: none; }
+            .main-content { margin-left: 70px; }
+            .complaint-details-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-city"></i>
+            <span class="logo-text">CivicConnect</span>
+        </div>
+        <div class="department-info">
+            <div class="department-name">Admin Portal</div>
+            <div class="department-role">Super Administrator</div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="#dashboard-stats" class="menu-item active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i><span class="menu-text">Dashboard</span></a>
+            <a href="#officers-section" class="menu-item" data-section="officers"><i class="fas fa-user-check"></i><span class="menu-text">Officer Approvals</span></a>
+            <a href="#complaints-section" class="menu-item" data-section="complaints"><i class="fas fa-flag"></i><span class="menu-text">All Complaints</span></a>
+            <a href="#analytics-section" class="menu-item" data-section="analytics"><i class="fas fa-chart-bar"></i><span class="menu-text">Analytics</span></a>
+            <div class="menu-divider"></div>
+            <a href="#" class="menu-item" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i><span class="menu-text">Logout</span></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-user-shield"></i> Admin Dashboard</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar-initials">AD</div>
+                <span id="user-display-name">Admin</span>
+                <button class="btn-outline" onclick="logout()" style="padding: 0.3rem 1rem;"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section">
+            <div class="dashboard-stats">
+                <div class="stat-card"><div class="stat-icon garbage"><i class="fas fa-trash-alt"></i></div><div><div class="stat-number" id="garbage-count">0</div><div class="stat-label">Garbage Issues</div></div></div>
+                <div class="stat-card"><div class="stat-icon roads"><i class="fas fa-road"></i></div><div><div class="stat-number" id="road-count">0</div><div class="stat-label">Road Issues</div></div></div>
+            </div>
+        
+
+        <!-- Officer Approvals Section -->
+        <div id="officers-section">
+            <div class="complaints-section">
+                <div class="section-header"><h2><i class="fas fa-user-clock"></i> Pending Officer Approvals</h2></div>
+                <div class="table-container">
+                    <table class="complaints-table">
+                        <thead><tr><th>Officer ID</th><th>Name</th><th>Email</th><th>Department</th><th>Actions</th></tr></thead>
+                        <tbody id="pending-officers-table"><tr><td colspan="5" style="text-align:center;">Loading officers...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complaints Section -->
+        <div id="complaints-section">
+            <div class="complaints-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-list-ul"></i> All Complaints</h2>
+                    <select id="issueFilter" class="filter-select">
+                        <option value="all">All Issues</option>
+                        <option value="garbage">Garbage</option>
+                        <option value="pothole">Roads / Pothole</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table class="complaints-table">
+                        <thead><tr><th>Complaint ID</th><th>Issue Type</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="admin-issues-table"><tr><td colspan="5" style="text-align:center;">Loading complaints...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analytics-section">
+            <div class="complaints-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Monthly Complaint Analysis</h2>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-outline" onclick="showBarChart()" style="padding: 0.3rem 0.8rem;">Bar</button>
+                        <button class="btn-outline" onclick="showLineChart()" style="padding: 0.3rem 0.8rem;">Line</button>
+                        <button class="btn-outline" onclick="showPieChart()" style="padding: 0.3rem 0.8rem;">Pie</button>
+                    </div>
+                </div>
+                <canvas id="monthlyChart" style="width:100%; max-height: 400px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Complaint Modal -->
+    <div id="complaint-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Complaint Details</h2><button class="close-modal" onclick="closeModal()">&times;</button></div>
+            <div class="modal-body">
+                <div class="complaint-details-grid">
+                    <div>
+                        <img id="modal-image" class="complaint-image" src="https://via.placeholder.com/300x200?text=Photo">
+                        <div class="ai-detection"><div class="detail-label">AI Detection</div><div class="detail-value" id="modal-issue-ai"></div></div>
+                    </div>
+                    <div>
+                        <div class="detail-group"><div class="detail-label">Complaint ID</div><div class="detail-value" id="modal-complaint-id"></div></div>
+                        <div class="detail-group"><div class="detail-label">Location</div><div class="detail-value" id="modal-location"></div></div>
+                        <div class="detail-group"><div class="detail-label">Submitted</div><div class="detail-value" id="modal-submitted"></div></div>
+                        <div class="detail-group"><div class="detail-label">Department</div><div class="detail-value" id="modal-department"></div></div>
+                        <div class="detail-group"><div class="detail-label">Citizen</div><div class="detail-value" id="modal-citizen-info"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chartInstance = null;
+        let analyticsLabels = [], analyticsValues = [];
+
+        // Helper functions
+        function setText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text || ''; }
+        function setHTML(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
+        function basename(path) { if (!path) return ''; return path.split('/').pop().split('\\').pop(); }
+
+        // Load pending officers
+        async function loadPendingOfficers() {
+            try {
+                const res = await fetch("/officers/pending");
+                const officers = await res.json();
+                const tbody = document.getElementById("pending-officers-table");
+                if (!tbody) return;
+                tbody.innerHTML = "";
+                if (!officers.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No pending officers</td></tr>';
+                    return;
+                }
+                officers.forEach(off => {
+                    const row = `<tr>
+                        <td>${off.id || off.officer_id || ''}</td>
+                        <td>${off.name || ''}</td>
+                        <td>${off.email || ''}</td>
+                        <td>${off.department || off.dept || 'N/A'}</td>
+                        <td>
+                            <button class="btn-primary btn-sm" onclick="approveOfficer('${off.id || off.officer_id}')">Approve</button>
+                            <button class="btn-outline btn-sm" onclick="rejectOfficer('${off.id || off.officer_id}')">Reject</button>
+                        </td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } catch (err) { console.error("Officers error:", err); }
+        }
+
+        async function approveOfficer(id) {
+            try {
+                const fd = new FormData(); fd.append("officer_id", id);
+                const res = await fetch("/approve-officer", { method: "POST", body: fd });
+                const data = await res.json();
+                alert(data.message || "Officer approved");
+                await loadPendingOfficers();
+            } catch (err) { alert("Approval failed"); }
+        }
+
+        async function rejectOfficer(id) {
+            if (!confirm("Reject this officer?")) return;
+            try {
+                const fd = new FormData(); fd.append("officer_id", id);
+                const res = await fetch("/reject-officer", { method: "POST", body: fd });
+                const data = await res.json();
+                alert(data.message || "Officer rejected");
+                await loadPendingOfficers();
+            } catch (err) { alert("Rejection failed"); }
+        }
+
+        // Load counts
+        async function loadCounts() {
+            try {
+                const [garbageRes, roadRes] = await Promise.all([
+                    fetch("/count/garbage"),
+                    fetch("/count/pothole")
+                ]);
+                const garbage = await garbageRes.json();
+                const road = await roadRes.json();
+                setText("garbage-count", garbage.count || 0);
+                setText("road-count", road.count || 0);
+            } catch (err) { console.error("Counts error:", err); }
+        }
+
+        // Load complaints with filter
+        async function loadComplaints(type = "all") {
+            let url = "/issues/all";
+            if (type === "garbage") url = "/issues/garbage";
+            if (type === "pothole") url = "/issues/pothole";
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                const tbody = document.getElementById("admin-issues-table");
+                tbody.innerHTML = "";
+                if (!data.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No complaints found</td></tr>';
+                    return;
+                }
+                data.forEach(issue => {
+                    const row = `<tr>
+                        <td>#CN-${issue.issue_id}</td>
+                        <td>${issue.detected_issue || 'Issue'}</td>
+                        <td>${issue.location_text || 'Unknown'}</td>
+                        <td><span class="status-badge" style="background:rgba(59,130,246,0.1);padding:0.2rem 0.6rem;border-radius:30px;">${issue.status || 'Pending'}</span></td>
+                        <td><button class="action-btn" onclick="viewDetails(${issue.issue_id})"><i class="fas fa-eye"></i> View</button></td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } catch (err) { console.error("Complaints error:", err); }
+        }
+
+        // View details modal
+        window.viewDetails = async function(issueId) {
+            try {
+                const res = await fetch(`/issue/${issueId}`);
+                const issue = await res.json();
+                setText("modal-complaint-id", "#CN-" + (issue.issue_id || issueId));
+                setText("modal-location", issue.location_text || "Unknown");
+                setText("modal-submitted", issue.created_at || "N/A");
+                setText("modal-department", issue.assigned_department || "Not assigned");
+                setText("modal-issue-ai", (issue.detected_issue || "Unknown").toUpperCase() + (issue.confidence ? ` (${issue.confidence})` : ""));
+                setHTML("modal-citizen-info", `${issue.citizen_name || 'Anonymous'}<br>${issue.citizen_email || 'No email'}`);
+                const imgPath = issue.image1_path
+                ? `/uploads/${basename(issue.image1_path)}`
+                : "https://via.placeholder.com/300x200?text=No+Photo";
+                document.getElementById("modal-image").src = imgPath;
+                document.getElementById("complaint-modal").classList.add("active");
+            } catch (err) { alert("Could not load details"); }
+        };
+        window.closeModal = () => document.getElementById("complaint-modal").classList.remove("active");
+        window.onclick = (e) => { if (e.target === document.getElementById("complaint-modal")) closeModal(); };
+
+        // Analytics
+        async function loadAnalytics() {
+            try {
+                const res = await fetch("/issues/all");
+                const data = await res.json();
+                const monthCount = {};
+                data.forEach(issue => {
+                    if (issue.created_at) {
+                        const month = issue.created_at.substring(0, 7);
+                        monthCount[month] = (monthCount[month] || 0) + 1;
+                    }
+                });
+                analyticsLabels = Object.keys(monthCount).sort();
+                analyticsValues = analyticsLabels.map(l => monthCount[l]);
+                showBarChart();
+            } catch (err) { console.error("Analytics error:", err); }
+        }
+
+        function drawChart(type, label) {
+            const ctx = document.getElementById("monthlyChart");
+            if (!ctx) return;
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: type,
+                data: { labels: analyticsLabels, datasets: [{ label: label, data: analyticsValues, borderWidth: 2, backgroundColor: type === 'pie' ? ['#2563eb','#3b82f6','#60a5fa','#93c5fd'] : '#2563eb' }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+        }
+        window.showBarChart = () => drawChart('bar', 'Monthly Complaints');
+        window.showLineChart = () => drawChart('line', 'Monthly Trend');
+        window.showPieChart = () => drawChart('pie', 'Distribution');
+
+        // Navigation
+        // function showSection(section) {
+        //     document.getElementById("dashboard-section").style.display = section === "dashboard" ? "block" : "none";
+        //     document.getElementById("officers-section").style.display = section === "officers" ? "block" : "none";
+        //     document.getElementById("complaints-section").style.display = section === "complaints" ? "block" : "none";
+        //     document.getElementById("analytics-section").style.display = section === "analytics" ? "block" : "none";
+        //     document.querySelectorAll(".menu-item").forEach(item => item.classList.remove("active"));
+        //     if (section === "dashboard") document.querySelector("[data-section='dashboard']").classList.add("active");
+        //     if (section === "officers") document.querySelector("[data-section='officers']").classList.add("active");
+        //     if (section === "complaints") document.querySelector("[data-section='complaints']").classList.add("active");
+        //     if (section === "analytics") document.querySelector("[data-section='analytics']").classList.add("active");
+        // }
+
+        // document.querySelectorAll(".menu-item[data-section]").forEach(item => {
+        //     item.addEventListener("click", (e) => {
+        //         e.preventDefault();
+        //         showSection(item.dataset.section);
+        //     });
+        // });
+
+        // Filter change
+        document.getElementById("issueFilter")?.addEventListener("change", (e) => {
+            loadComplaints(e.target.value);
+        });
+
+        // Logout
+        function logout() {
+            if (confirm("Logout from admin dashboard?")) {
+                localStorage.removeItem("cc_user_logged_in");
+                localStorage.removeItem("cc_user_email");
+                localStorage.removeItem("cc_user_role");
+                window.location.href = "/login";
+            }
+        }
+
+        // Load admin profile
+        function loadAdminProfile() {
+            const email = localStorage.getItem("cc_user_email") || "admin@civicconnect.gov";
+            const initials = email.split('@')[0].slice(0,2).toUpperCase();
+            setText("user-avatar-initials", initials);
+            setText("user-display-name", email);
+        }
+
+        // Initialize
+        document.addEventListener("DOMContentLoaded", () => {
+            loadAdminProfile();
+            loadPendingOfficers();
+            loadCounts();
+            loadComplaints("all");
+            loadAnalytics();
+        });
+    </script>
+</body>
+</html>

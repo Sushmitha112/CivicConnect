@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officer Login · CivicConnect</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #3b82f6;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gray-soft: #f1f5f9;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-md: 0 20px 30px -10px rgba(0,0,0,0.1), 0 8px 15px -6px rgba(0,0,0,0.05);
+            --shadow-sm: 0 6px 12px -6px rgba(0,0,0,0.1);
+            --radius-xl: 32px;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #f8fafc 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            color: var(--dark);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* glass card */
+        .login-container {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        /* left panel – brand & features */
+        .login-left {
+            flex: 1;
+            background: linear-gradient(155deg, var(--primary) 0%, var(--primary-soft) 120%);
+            color: white;
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 2.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1.5rem 0.5rem 1rem;
+            border-radius: 60px;
+            width: fit-content;
+            backdrop-filter: blur(4px);
+        }
+        .logo i { font-size: 2.3rem; }
+
+        .welcome-text h1 {
+            font-size: clamp(2rem, 4vw, 2.6rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.2rem;
+        }
+        .welcome-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 28ch;
+        }
+
+        .features {
+            list-style: none;
+            margin-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .features li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 1.05rem;
+            background: rgba(255,255,255,0.12);
+            padding: 0.8rem 1.2rem;
+            border-radius: 50px;
+            backdrop-filter: blur(2px);
+        }
+        .features i {
+            font-size: 1.3rem;
+            width: 28px;
+            color: white;
+        }
+
+        /* right panel – form */
+        .login-right {
+            flex: 1;
+            padding: 3rem 2.5rem;
+            background: white;
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+        }
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+        .form-header p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1.2rem;
+            transition: color 0.15s;
+        }
+        .form-control {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3.2rem;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            background: var(--light);
+            transition: all 0.2s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+        }
+        .form-control:focus + .input-icon {
+            color: var(--primary);
+        }
+
+        .remember-forgot {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 1.2rem 0 1.8rem;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
+        .remember-me input {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--primary);
+            margin: 0;
+        }
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-bottom: 1px dashed transparent;
+            transition: 0.15s;
+        }
+        .forgot-password:hover {
+            border-bottom-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 8px 18px rgba(37,99,235,0.3);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -6px var(--primary);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0 1.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-light);
+        }
+        .divider span { padding: 0 1rem; }
+
+        .login-footer {
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+        .login-footer a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .login-footer a:hover { text-decoration: underline; }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+            padding-left: 0.8rem;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+        .error-message i { font-size: 0.8rem; }
+
+        /* Officer Registration Card - Styled to match design */
+        .officer-reg-card {
+            background: var(--gray-soft);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--gray-light);
+            transition: all 0.3s ease;
+        }
+        .officer-reg-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .officer-reg-card h3 i {
+            color: var(--primary);
+        }
+        .officer-reg-card .form-group {
+            margin-bottom: 1rem;
+        }
+        .officer-reg-card .form-control {
+            background: white;
+        }
+        .officer-reg-card select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+        .btn-secondary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-secondary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        .btn-cancel-reg {
+            background: var(--gray-light);
+            color: var(--dark);
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+        .btn-cancel-reg:hover {
+            background: var(--gray);
+            color: white;
+        }
+        .register-link {
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px dashed transparent;
+            transition: 0.15s;
+        }
+        .register-link:hover {
+            border-bottom-color: var(--primary);
+        }
+
+        /* forgot password modal – clean */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15,23,42,0.4);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: var(--shadow-md);
+            animation: modalFadeIn 0.2s;
+        }
+        @keyframes modalFadeIn { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-header h2 { font-size: 1.6rem; color: var(--dark); font-weight: 700; }
+        .close-btn {
+            background: none; border: none;
+            font-size: 1.8rem; cursor: pointer;
+            color: var(--gray); line-height: 1;
+        }
+        .close-btn:hover { color: var(--dark); }
+
+        .modal-body p { color: var(--gray); margin-bottom: 1rem; }
+        .modal-body input {
+            width: 100%; padding: 1rem;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+        }
+        .modal-body input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 2rem;
+        }
+        .modal-footer button {
+            flex: 1;
+            padding: 0.9rem;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-reset {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-reset:hover { background: var(--primary-dark); }
+        .btn-cancel {
+            background: var(--gray-light);
+            color: var(--dark);
+        }
+        .btn-cancel:hover { background: #d0d9e6; }
+
+        /* Responsive */
+        @media (max-width: 750px) {
+            .login-container { flex-direction: column; border-radius: var(--radius-lg); }
+            .login-left { border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 2rem; }
+            .login-right { padding: 2rem; }
+            .logo { margin-bottom: 1.5rem; }
+            .features { margin-top: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- LEFT side: brand & value props -->
+        <div class="login-left">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <span>CivicConnect</span>
+            </div>
+            <div class="welcome-text">
+                <h1>Officer & citizen portal</h1>
+                <p>Secure access to manage civic issues across departments.</p>
+            </div>
+            <ul class="features">
+                <li><i class="fas fa-user-shield"></i><span><strong>Officers:</strong> department dashboard & tasks</span></li>
+                <li><i class="fas fa-flag-checkered"></i><span><strong>Citizens:</strong> track reports & updates</span></li>
+                <li><i class="fas fa-clock"></i><span>real‑time status · verified access</span></li>
+                <li><i class="fas fa-shield-alt"></i><span>end‑to‑end encrypted</span></li>
+            </ul>
+        </div>
+
+        <!-- RIGHT side: login form -->
+        <div class="login-right">
+            <div class="form-header">
+                <h2>Welcome back</h2>
+                <p>Sign in with your credentials</p>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <!-- email / username -->
+                <div class="form-group">
+                    <label for="username">Email or username</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="text" id="username" class="form-control" placeholder="officer@civicconnect.gov">
+                    </div>
+                    <div class="error-message" id="username-error"><i class="fas fa-exclamation-circle"></i> enter valid email</div>
+                </div>
+
+                <!-- password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" class="form-control" placeholder="············">
+                    </div>
+                    <div class="error-message" id="password-error"><i class="fas fa-exclamation-circle"></i> password required</div>
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember"> <span>Keep me signed in</span>
+                    </label>
+                    <a href="#" class="forgot-password" onclick="openForgotPassword(event)">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary"><i class="fas fa-arrow-right-to-bracket"></i> Sign in</button>
+
+                <div class="divider"><span>authorized personnel only</span></div>
+
+                <div class="login-footer">
+                    <p>Citizen? <a href="/signup" class="register-link">Create account</a></p>
+                    <p>Officer? <a href="#" class="register-link" onclick="toggleOfficerRegister(event)">Request officer access</a></p>
+                </div>
+            </form>
+
+            <!-- Officer Registration Form - Styled to match design -->
+            <div id="officerRegisterBox" style="display:none;">
+                <div class="officer-reg-card">
+                    <h3><i class="fas fa-user-tie"></i> Officer Registration</h3>
+                    <form id="officerRegisterForm">
+                        <div class="form-group">
+                            <label for="reg-name">Full Name</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="reg-name" name="name" class="form-control" placeholder="Enter your full name" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-email">Email Address</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="reg-email" name="email" class="form-control" placeholder="officer@civicconnect.gov" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-password">Password</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="reg-password" name="password" class="form-control" placeholder="Create a strong password" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg-department">Department</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-building input-icon"></i>
+                                <select id="reg-department" name="department" class="form-control" required>
+                                    <option value="">Select Department</option>
+                                    <option value="Garbage">🗑️ Sanitation & Waste Management</option>
+                                    <option value="Roads">🛣️ Roads & Public Works</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-secondary"><i class="fas fa-paper-plane"></i> Submit Request</button>
+                        <button type="button" class="btn-cancel-reg" onclick="toggleOfficerRegister(event)"><i class="fas fa-times"></i> Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reset password</h2>
+                <button class="close-btn" onclick="closeForgotPassword()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Enter your registered email. We'll send a reset link.</p>
+                <input type="email" id="resetEmail" placeholder="officer@civicconnect.gov">
+                <div class="error-message" id="reset-error"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-reset" onclick="sendResetLink()"><i class="fas fa-paper-plane"></i> Send</button>
+                <button class="btn-cancel" onclick="closeForgotPassword()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Email extractor helper
+        function extractEmailFrom(obj) {
+            if (!obj) return '';
+            if (typeof obj === 'string') return obj;
+            if (obj.email) return obj.email;
+            if (obj.officer && obj.officer.email) return obj.officer.email;
+            if (obj.user && obj.user.email) return obj.user.email;
+            if (obj.data && obj.data.email) return obj.data.email;
+            return '';
+        }
+
+        // Live validation cleanup
+        document.getElementById('username').addEventListener('input', () => {
+            document.getElementById('username-error').style.display = 'none';
+        });
+        document.getElementById('password').addEventListener('input', () => {
+            document.getElementById('password-error').style.display = 'none';
+        });
+
+        // Toggle Officer Registration Form
+        function toggleOfficerRegister(event) {
+            event.preventDefault();
+            const box = document.getElementById('officerRegisterBox');
+            if (box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'block';
+                // Scroll to registration form
+                box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                box.style.display = 'none';
+                // Reset form when closing
+                document.getElementById('officerRegisterForm').reset();
+            }
+        }
+
+        // Officer Registration Submit
+        document.getElementById("officerRegisterForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Submitting...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch("/officer-register", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert("✅ Registration request sent successfully! Wait for admin approval.");
+                    this.reset();
+                    // Hide the registration form after successful submission
+                    document.getElementById('officerRegisterBox').style.display = 'none';
+                } else {
+                    alert(data.message || "❌ Registration failed. Please try again.");
+                }
+            } catch (err) {
+                console.error("Registration error:", err);
+                alert("❌ Could not connect to server. Please try again later.");
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Login submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            document.getElementById('username-error').style.display = 'none';
+            document.getElementById('password-error').style.display = 'none';
+
+            if (!email) {
+                document.getElementById('username-error').textContent = "Email required";
+                document.getElementById('username-error').style.display = "flex";
+                return;
+            }
+            if (!password) {
+                document.getElementById('password-error').textContent = "Password required";
+                document.getElementById('password-error').style.display = "flex";
+                return;
+            }
+
+            // ADMIN LOGIN
+            let adminData = new FormData();
+            adminData.append("email", email);
+            adminData.append("password", password);
+
+            try {
+                const adminRes = await fetch("/admin-login", {
+                    method: "POST",
+                    body: adminData
+                });
+                const admin = await adminRes.json();
+                if (admin.success) {
+                    localStorage.setItem("cc_user_logged_in", "true");
+                    localStorage.setItem("cc_user_role", "admin");
+                    const adminEmail = extractEmailFrom(admin) || admin.username || '';
+                    if (adminEmail) localStorage.setItem("cc_user_email", adminEmail);
+                    window.location.href = "/admindashborad";
+                    return;
+                }
+            } catch (err) {
+                console.log("admin check failed, continue");
+            }
+
+            // OFFICER LOGIN
+            async function officerLogin(email, password) {
+                let fd = new FormData();
+                fd.append("email", email);
+                fd.append("password", password);
+                let res = await fetch("/officer-login", {
+                    method: "POST",
+                    body: fd
+                });
+                return res.json();
+            }
+
+            const officer = await officerLogin(email, password);
+            if (officer.success) {
+                localStorage.setItem("cc_user_logged_in", "true");
+                localStorage.setItem("cc_user_role", "officer");
+
+                const officerEmail = extractEmailFrom(officer.officer) || extractEmailFrom(officer) || '';
+                if (officerEmail) localStorage.setItem("cc_user_email", officerEmail);
+                localStorage.setItem("cc_user_department", officer.officer.department);
+                localStorage.setItem("cc_user_id", officer.officer.id);
+                localStorage.setItem("cc_user_name", officer.officer.name);
+
+                const dept = officer.officer.department.toLowerCase();
+                if (dept.includes("garbage") || dept.includes("sanitation")) {
+                    window.location.href = "/garbagereportdashbord";
+                } else if (dept.includes("road") || dept.includes("pothole")) {
+                    window.location.href = "/potholereportdashbord";
+                } else {
+                    alert("Unknown department assigned.");
+                }
+                return;
+            }
+
+            let officerPending = (officer.message && officer.message.includes("pending"));
+
+            // CITIZEN LOGIN
+            let formData = new FormData();
+            formData.append("email", email);
+            formData.append("password", password);
+
+            try {
+                const res = await fetch("/login", {
+                    method: "POST",
+                    body: formData
+                });
+                const result = await res.json();
+
+                if (!result.success) {
+                    if (officerPending) {
+                        alert("⏳ Your officer account is pending admin approval.");
+                        return;
+                    }
+                    alert(result.message || "Invalid credentials");
+                    return;
+                }
+
+                const user = result.user;
+                localStorage.setItem("cc_user_logged_in", "true");
+                localStorage.setItem("cc_user_email", user.email || "");
+                localStorage.setItem("cc_user_name", user.name || "");
+                localStorage.setItem("cc_user_phone", user.phone || "");
+                localStorage.setItem("cc_user_pincode", user.pincode || "");
+                localStorage.setItem("cc_user_role", "citizen");
+
+                alert("✅ Login successful!");
+                window.location.href = "/";
+            } catch (err) {
+                console.error("Login error:", err);
+                alert("Could not connect to server.");
+            }
+        });
+
+        // Forgot password modal functions
+        function openForgotPassword(event) {
+            event.preventDefault();
+            document.getElementById('forgotPasswordModal').classList.add('active');
+            document.getElementById('resetEmail').focus();
+        }
+        
+        function closeForgotPassword() {
+            document.getElementById('forgotPasswordModal').classList.remove('active');
+            document.getElementById('resetEmail').value = '';
+            document.getElementById('reset-error').style.display = 'none';
+        }
+        
+        window.sendResetLink = function() {
+            const email = document.getElementById('resetEmail').value.trim();
+            const errorMsg = document.getElementById('reset-error');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!email || !emailRegex.test(email)) {
+                errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> valid email required';
+                errorMsg.style.display = 'flex';
+                return;
+            }
+
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Sending...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert(`🔐 Reset link sent to ${email} (demo)`);
+                closeForgotPassword();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1200);
+        };
+
+        // Click outside modal to close
+        window.onclick = function(event) {
+            const modal = document.getElementById('forgotPasswordModal');
+            if (event.target === modal) closeForgotPassword();
+        };
+    </script>
+</body>
+</html>

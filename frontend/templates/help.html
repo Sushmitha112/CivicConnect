@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support · CivicConnect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #3b82f6;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gray-soft: #f1f5f9;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 20px rgba(0,0,0,0.08);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #f8fafc 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .logo i { font-size: 1.8rem; }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 0.25rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .user-actions > div {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .user-email {
+            font-size: 0.9rem;
+            color: var(--gray);
+            background: var(--gray-soft);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-circle:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(145deg, var(--primary) 0%, var(--primary-soft) 100%);
+            color: white;
+            padding: 4rem 0;
+            border-radius: 0 0 48px 48px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.92;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .back-btn {
+            background: white;
+            border: 1px solid var(--gray-light);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover {
+            background: var(--gray-soft);
+        }
+        .page-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 1.8rem;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--dark);
+        }
+        .card h2 i {
+            color: var(--primary);
+        }
+
+        /* Steps */
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+        .step {
+            display: flex;
+            gap: 1.2rem;
+        }
+        .step-number {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+            color: white;
+            border-radius: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .step-content h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--dark);
+        }
+        .step-content p {
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        /* FAQ */
+        .faq-item {
+            border-bottom: 1px solid var(--gray-light);
+            margin-bottom: 1rem;
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .faq-question {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .faq-question:hover {
+            color: var(--primary);
+        }
+        .faq-question i:first-child {
+            color: var(--primary);
+            font-size: 1rem;
+            transition: transform 0.3s;
+        }
+        .faq-question h4 {
+            flex: 1;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .faq-question .fa-chevron-down {
+            color: var(--gray);
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding-bottom 0.2s;
+            padding-left: 2.2rem;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-bottom: 1rem;
+        }
+        .faq-item.active .faq-question .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        /* Contact Card */
+        .contact-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .contact-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .contact-card h3 i {
+            color: var(--primary);
+        }
+        .contact-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            background: var(--gray-soft);
+            border-radius: var(--radius-sm);
+            transition: background 0.2s;
+        }
+        .contact-method:hover {
+            background: var(--gray-light);
+        }
+        .contact-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .contact-details h4 {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+        .contact-details p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.8rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .quick-links h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quick-links h3 i {
+            color: var(--primary);
+        }
+        .link-list {
+            list-style: none;
+        }
+        .link-list li {
+            margin-bottom: 0.75rem;
+        }
+        .link-list a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            background: var(--gray-soft);
+            border-radius: var(--radius-sm);
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .link-list a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(4px);
+        }
+        .link-list a i {
+            width: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            margin-top: 2rem;
+        }
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+        .footer-column h3 {
+            margin-bottom: 1.2rem;
+            font-size: 1.1rem;
+        }
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links li { margin-bottom: 0.6rem; }
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .footer-links a:hover { color: white; }
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 850px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .nav-links {
+                justify-content: center;
+            }
+            .step {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .step-number {
+                align-self: flex-start;
+            }
+            .faq-answer {
+                padding-left: 0;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+            .card, .contact-card, .quick-links {
+                padding: 1.5rem;
+            }
+            .contact-method {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo"><i class="fas fa-city"></i><span>CivicConnect</span></div>
+                <div class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="#" onclick="goToNearbyIssues(event)">Nearby Issues</a>
+                    <a href="#" class="active">Help</a>
+                </div>
+                <div class="user-actions">
+                    <div id="user-actions-guest">
+                        <button class="btn btn-outline" onclick="window.location.href='/login'">Login</button>
+                        <button class="btn btn-primary" onclick="window.location.href='/signup'">Sign Up</button>
+                    </div>
+                    <div id="user-actions-auth" style="display:none;">
+                        <span id="user-email" class="user-email"></span>
+                        <button class="btn-circle" id="profile-btn"><i class="fas fa-user"></i></button>
+                        <button class="btn-circle" id="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1><i class="fas fa-life-ring"></i> Help & Support Center</h1>
+            <p>Find answers, step-by-step guides, and get in touch with our support team.</p>
+        </div>
+    </section>
+
+    <main class="container">
+        <div class="page-header">
+            <button class="back-btn" onclick="window.location.href='home.html'"><i class="fas fa-arrow-left"></i> Back to Home</button>
+            <i class="fas fa-question-circle" style="font-size: 1.8rem; color: var(--primary);"></i>
+            <h2>How can we help you?</h2>
+        </div>
+
+        <div class="main-grid">
+            <!-- Left Column: Main Content -->
+            <div>
+                <!-- How to Report -->
+                <div class="card">
+                    <h2><i class="fas fa-flag-checkered"></i> How to Report an Issue</h2>
+                    <div class="steps-container">
+                        <div class="step"><div class="step-number">1</div><div class="step-content"><h4>Navigate to Report Page</h4><p>Click "Report an Issue" on the homepage or use the navigation menu.</p></div></div>
+                        <div class="step"><div class="step-number">2</div><div class="step-content"><h4>Login / Sign Up</h4><p>Authenticate with your CivicConnect account to submit reports and track progress.</p></div></div>
+                        <div class="step"><div class="step-number">3</div><div class="step-content"><h4>Fill in Details</h4><p>Add a clear description, upload up to 2 photos, and the system will auto-detect issue type.</p></div></div>
+                        <div class="step"><div class="step-number">4</div><div class="step-content"><h4>Pin Location</h4><p>Use the interactive map or “Use My Location” to mark exact spot — accuracy speeds up resolution.</p></div></div>
+                        <div class="step"><div class="step-number">5</div><div class="step-content"><h4>Submit & Track</h4><p>After submission, you'll receive a unique Complaint ID. Track status via “My Complaints” dashboard.</p></div></div>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="card">
+                    <h2><i class="fas fa-comments"></i> Frequently Asked Questions</h2>
+                    <div class="faq-item active">
+                        <div class="faq-question" onclick="toggleFaq(this)"><i class="fas fa-question-circle"></i><h4>Who can use CivicConnect?</h4><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer"><p>Both citizens and municipal officers. Citizens report issues and track complaints; officers use the dedicated portal to manage and resolve cases efficiently.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)"><i class="fas fa-question-circle"></i><h4>How many photos can I upload?</h4><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer"><p>Currently you can upload up to 2 photos per report. Clear images help AI classification and speed up department assignment.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)"><i class="fas fa-question-circle"></i><h4>How are reports routed to departments?</h4><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer"><p>Our AI analyzes description and image to detect the issue type and automatically assigns the report to the correct department (Sanitation, Roads, Water, etc.).</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)"><i class="fas fa-question-circle"></i><h4>How do I track my report progress?</h4><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer"><p>Go to “My Complaints” in your dashboard. You can view real-time status, assigned department, and updates from officers.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)"><i class="fas fa-question-circle"></i><h4>What if I forgot my password?</h4><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer"><p>Click “Forgot password?” on the login page and follow the instructions sent to your registered email.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)"><i class="fas fa-question-circle"></i><h4>How long does resolution take?</h4><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer"><p>Resolution time depends on issue type and severity. Minor issues may take 2–4 days, while major infrastructure repairs can take up to 2 weeks. Live updates are available in dashboard.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <div>
+                <!-- Contact Support -->
+                <div class="contact-card">
+                    <h3><i class="fas fa-headset"></i> Contact Support</h3>
+                    <div class="contact-methods">
+                        <div class="contact-method"><div class="contact-icon"><i class="fas fa-envelope"></i></div><div class="contact-details"><h4>Email Support</h4><p>civicconnect@gmail.com</p></div></div>
+                        <div class="contact-method"><div class="contact-icon"><i class="fas fa-phone-alt"></i></div><div class="contact-details"><h4>Phone (24/7 Helpline)</h4><p>+91 9876543210</p></div></div>
+                        <div class="contact-method"><div class="contact-icon"><i class="fas fa-clock"></i></div><div class="contact-details"><h4>Support Hours</h4><p>Mon–Fri: 8 AM – 8 PM<br>Sat–Sun: 9 AM – 5 PM</p></div></div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="quick-links">
+                    <h3><i class="fas fa-link"></i> Quick Resources</h3>
+                    <ul class="link-list">
+                        <li><a href="/"><i class="fas fa-flag"></i> Report an Issue</a></li>
+                        <li><a href="/userdashborad"><i class="fas fa-list-ul"></i> My Complaints</a></li>
+                        <li><a href="#" onclick="goToNearbyIssues(event)"><i class="fas fa-map-marker-alt"></i> Nearby Issues</a></li>
+                        <li><a href="/login"><i class="fas fa-user-shield"></i> Officer Login</a></li>
+                        <li><a href="/signup"><i class="fas fa-user-plus"></i> Create Account</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column"><h3>Quick Links</h3><ul class="footer-links"><li><a href="/">Report Issue</a></li><li><a href="/nearbyissue">Nearby Issues</a></li><li><a href="/help">Help / FAQ</a></li></ul></div>
+                <div class="footer-column"><h3>Contact</h3><ul class="footer-links"><li><a href="tel:+919876543210"><i class="fas fa-phone"></i> +91 9876543210</a></li><li><a href="mailto:civicconnect@gmail.com"><i class="fas fa-envelope"></i> civicconnect@gmail.com</a></li></ul></div>
+            </div>
+            <div class="copyright">&copy; 2025 CivicConnect — transparent civic engagement</div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ Toggle
+        function toggleFaq(element) {
+            const faqItem = element.closest('.faq-item');
+            faqItem.classList.toggle('active');
+        }
+
+        // Authentication & user UI
+        function isUserLoggedIn() {
+            return localStorage.getItem("cc_user_logged_in") === "true";
+        }
+
+        function updateUserActions() {
+            const guestDiv = document.getElementById('user-actions-guest');
+            const authDiv = document.getElementById('user-actions-auth');
+            const emailSpan = document.getElementById('user-email');
+            if (isUserLoggedIn()) {
+                guestDiv.style.display = 'none';
+                authDiv.style.display = 'flex';
+                const email = localStorage.getItem('cc_user_email') || 'Account';
+                emailSpan.innerText = email;
+            } else {
+                guestDiv.style.display = 'flex';
+                authDiv.style.display = 'none';
+            }
+        }
+
+        function goToDashboard() {
+            const role = localStorage.getItem('cc_user_role') || 'citizen';
+            const department = (localStorage.getItem('cc_user_department') || '').toLowerCase();
+            if (role === 'officer' && (department.includes('garbage') || department.includes('sanitation'))) {
+                window.location.href = '/garbagereportdashbord';
+            } else if (role === 'officer' && (department.includes('road') || department.includes('pothole'))) {
+                window.location.href = '/potholereportdashbord';
+            } else {
+                window.location.href = '/userdashborad';
+            }
+        }
+
+        document.getElementById('profile-btn')?.addEventListener('click', goToDashboard);
+        document.getElementById('logout-btn')?.addEventListener('click', () => {
+            localStorage.removeItem('cc_user_logged_in');
+            localStorage.removeItem('cc_user_email');
+            localStorage.removeItem('cc_user_role');
+            updateUserActions();
+            window.location.href = '/';
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserActions();
+            // First FAQ already active by default
+        });
+        function isUserLoggedIn() {
+    return localStorage.getItem("cc_user_logged_in") === "true";
+}
+
+    function goToNearbyIssues(event) {
+        event.preventDefault();
+
+        if (!isUserLoggedIn()) {
+            alert("Please login first to view nearby issues.");
+            window.location.href = "/login";
+            return;
+        }
+
+        window.location.href = "/nearbyissue";
+    }
+    </script>
+</body>
+</html>

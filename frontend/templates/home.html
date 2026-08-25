@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicConnect · Civic Issue Reporting</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet (professional map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- EXIF.js for metadata -->
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+            background: rgba(255,255,255,0.95);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+        .logo i { font-size: 2rem; }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            font-weight: 500;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            transition: color 0.2s;
+            padding: 0.25rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+        .user-actions > div {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .user-email {
+            font-size: 0.95rem;
+            color: var(--gray);
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            background: var(--light);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            border: 1px solid var(--gray-light);
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.6rem 1.4rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s ease;
+            border: none;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 6px rgba(37,99,235,0.2);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background: rgba(37,99,235,0.04);
+            border-color: var(--primary-dark);
+        }
+        .btn-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 44px;
+            padding: 0;
+            background: white;
+            color: var(--dark);
+            border: 1px solid var(--gray-light);
+            font-size: 1.2rem;
+            transition: 0.15s;
+            cursor: pointer;
+        }
+        .btn-circle:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--gray-light);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            color: var(--dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .back-btn:hover {
+            background: var(--light);
+            border-color: var(--gray);
+        }
+
+        .hero {
+            background: linear-gradient(145deg, var(--primary) 0%, #3b82f6 100%);
+            color: white;
+            padding: 4rem 0;
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 720px;
+            margin: 0 auto 1.5rem;
+            opacity: 0.9;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0 4rem;
+        }
+        .action-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s;
+            cursor: pointer;
+        }
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+        .action-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        .action-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .action-card p { color: var(--gray); font-size: 1rem; }
+
+        .page-container {
+            display: none;
+            background: white;
+            border-radius: 28px;
+            padding: 2rem 2rem 2.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 3rem;
+        }
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        .page-header i { font-size: 1.8rem; color: var(--primary); }
+        .page-header h2 { font-size: 1.9rem; font-weight: 600; }
+
+        .form-group { margin-bottom: 2rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.05rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 16px;
+            font-size: 1rem;
+            transition: 0.15s;
+            background: white;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+
+        .upload-area {
+            border: 2.5px dashed var(--gray-light);
+            border-radius: 28px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            background: #fafcff;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f5f9ff;
+        }
+        .upload-icon i { font-size: 3.5rem; color: var(--primary); opacity: 0.7; }
+        .small-text { font-size: 0.9rem; color: var(--gray); margin-top: 0.5rem; }
+        #photo-previews {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        #photo-previews img {
+            width: 100px; height: 100px; object-fit: cover; border-radius: 18px;
+            border: 2px solid white; box-shadow: var(--shadow-sm);
+        }
+
+        #map-container {
+            width: 100%;
+            height: 300px;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 2px solid var(--gray-light);
+            margin-bottom: 1rem;
+        }
+        #map { width: 100%; height: 100%; z-index: 1; }
+
+        .location-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .location-row .form-control { flex: 2; min-width: 200px; }
+        .location-row .btn { flex: 0 0 auto; border-radius: 40px; padding: 0.8rem 1.5rem; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 10px rgba(37,99,235,0.3);
+            margin-top: 1rem;
+        }
+        .submit-btn:hover { background: var(--primary-dark); transform: scale(1.02); }
+
+        .confirmation-container { max-width: 700px; margin: 0 auto; }
+        .success-icon {
+            width: 80px; height: 80px;
+            background: var(--success);
+            color: white;
+            font-size: 3rem;
+            border-radius: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        .confirmation-header h1 { font-size: 2.2rem; color: var(--dark); }
+        .confirmation-header p { color: var(--gray); font-size: 1.1rem; }
+
+        .details-card {
+            background: var(--light);
+            border-radius: 28px;
+            padding: 2rem;
+            margin: 2.5rem 0;
+            text-align: left;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-light);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .detail-row:last-child { border: none; }
+        .label { font-weight: 600; color: var(--dark); }
+        .value { color: var(--gray); text-align: right; }
+        .complaint-id { color: var(--primary); font-weight: 700; }
+
+        .assigned-department {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem 1.5rem;
+            margin: 1.2rem 0;
+            border-left: 5px solid var(--primary);
+        }
+        .department-info { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+        .dept-icon { font-size: 2.5rem; }
+        .dept-name { font-weight: 700; color: var(--primary); }
+        .dept-contact { color: var(--gray); font-size: 0.95rem; }
+
+        .action-buttons { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        .btn-secondary { background: white; border: 1.5px solid var(--primary); color: var(--primary); }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3.5rem 0 2rem;
+            margin-top: auto;
+        }
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2.5rem;
+        }
+        .footer-column { min-width: 200px; text-align: center; }
+        .footer-column h3 { margin-bottom: 1.5rem; font-size: 1.2rem; font-weight: 600; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: #cbd5e1; text-decoration: none; }
+        .footer-links a:hover { color: white; }
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+        }
+
+        .next-steps {
+            background: var(--light);
+            border-radius: 28px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        .next-steps h3 { margin-bottom: 1rem; }
+        .next-steps ul { padding-left: 1.5rem; }
+        .next-steps li { margin-bottom: 0.5rem; color: var(--gray); }
+
+        @media (max-width: 600px) {
+            .navbar { flex-direction: column; align-items: stretch; }
+            .nav-links { justify-content: center; }
+            .user-actions { justify-content: center; }
+            .detail-row { flex-direction: column; align-items: flex-start; }
+            .value { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo"><i class="fas fa-city"></i><span>CivicConnect</span></div>
+                <div class="nav-links">
+                    <a href="#" onclick="showPage('home-page'); return false;">Home</a>
+                    <a href="#" onclick="goToNearbyIssues(event)">Nearby Issues</a>
+                    <a href="/help">Help</a>
+                </div>
+                <div class="user-actions">
+                    <div id="user-actions-guest">
+                        <button class="btn btn-outline" onclick="window.location.href='/login'">Login</button>
+                        <button class="btn btn-primary" onclick="window.location.href='/signup'">Sign Up</button>
+                    </div>
+                    <div id="user-actions-auth" style="display:none;">
+                        <span id="user-email" class="user-email"></span>
+                        <button class="btn-circle" id="profile-btn" title="Account"><i class="fas fa-user"></i></button>
+                        <button class="btn-circle" id="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home-page">
+        <div class="hero">
+            <div class="container">
+                <h1>Report civic issues. Track solutions.</h1>
+                <p>Help keep our city clean, safe, and well‑maintained — your report goes directly to the right department.</p>
+            </div>
+        </div>
+        <div class="container">
+            <div class="quick-actions">
+                <div class="action-card" onclick="showPage('report-page')">
+                    <div class="action-icon"><i class="fas fa-flag"></i></div>
+                    <h3>Report an Issue</h3>
+                    <p>File a complaint with photos & precise location</p>
+                </div>
+                <div class="action-card" onclick="goToNearbyIssues(event)">
+                    <div class="action-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3>Nearby Issues</h3>
+                    <p>See what neighbors have reported in your area</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="report-page" class="page-container">
+        <div class="container" style="max-width: 900px;">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('home-page')"><i class="fas fa-chevron-left"></i> Back</button>
+                <i class="fas fa-flag"></i><h2>Report an issue</h2>
+            </div>
+            <form id="issue-form">
+                <div class="form-group">
+                    <label>Upload photos (max 2) <span style="font-weight:400;">— required</span></label>
+                    <div class="upload-area" onclick="document.getElementById('real-photo').click()">
+                        <input type="file" id="real-photo" accept="image/*" multiple style="display:none" onchange="previewPhotos(event)">
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <p><strong>Click or drag</strong> (JPEG, PNG up to 5MB)</p>
+                        <p class="small-text">you can add up to 2 photos</p>
+                        <div id="photo-previews"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="issue-description">Description <span style="color: var(--gray);">(optional)</span></label>
+                    <textarea id="issue-description" class="form-control" rows="3" placeholder="e.g., large pothole near crosswalk, garbage not collected..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>📍 Pin the location </label>
+                    <div id="map-container">
+                        <div id="map"></div>
+                    </div>
+                    <div class="location-row" style="margin-top:1rem;">
+                        <input type="text" id="issue-location" class="form-control" placeholder="Selected address" readonly>
+                        <input type="hidden" id="location-lat">
+                        <input type="hidden" id="location-lng">
+                        <input type="hidden" id="issue-pincode">
+                        <button type="button" class="btn btn-outline" onclick="getCurrentLocation(this)"><i class="fas fa-location-dot"></i> Use my location</button>
+                    </div>
+                </div>
+
+                <button type="button" class="submit-btn" onclick="submitIssue()">Submit issue</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="confirmation-page" class="page-container">
+        <div class="container" style="max-width: 750px;">
+            <div class="confirmation-container">
+                <div class="success-icon"><i class="fas fa-check"></i></div>
+                <div class="confirmation-header">
+                    <h1>Issue reported</h1>
+                    <p>Your complaint has been logged and routed to the responsible team.</p>
+                </div>
+
+                <div class="details-card">
+                    <h2 style="margin-bottom: 1.5rem;">Complaint details</h2>
+                    <div class="detail-row">
+                        <span class="label">Detected issue type:</span>
+                        <span class="value"><strong id="detected-issue">Garbage / sanitation</strong></span>
+                    </div>
+                    <div class="assigned-department">
+                        <div class="detail-row" style="border:none; padding:0 0 0.5rem;">
+                            <span class="label">Assigned to:</span>
+                            <div class="department-info">
+                                <span class="dept-icon" id="dept-icon">🗑️</span>
+                                <div>
+                                    <div class="dept-name" id="dept-name">Sanitation & Waste Management</div>
+                                    <p class="dept-contact" id="dept-contact">Field inspector assigned · response within 48h</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Location:</span>
+                        <span class="value" id="confirmed-location">456 Main St (via GPS)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Complaint ID:</span>
+                        <span class="value complaint-id" id="complaint-id">#CVC‑2025‑4281</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Submitted:</span>
+                        <span class="value" id="submission-time">March 20, 2026 · 11:42 AM</span>
+                    </div>
+                </div>
+
+                <div class="next-steps">
+                    <h3>What Happens Next?</h3>
+                    <ul>
+                        <li>The assigned department will review the complaint within 24 hours.</li>
+                        <li>You will receive status updates via User Dashboard.</li>
+                        <li>Use your Complaint ID to track the progress at any time.</li>
+                        <li>Expected resolution time: 10-15 business days for this issue type.</li>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="showPage('report-page')">Report Another Issue</button>
+                    <button class="btn btn-primary" onclick="window.location.href='/userdashborad'">Track Issue</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column"><h3>Quick Links</h3><ul class="footer-links"><li><a href="#" onclick="showPage('report-page');return false;">Report an Issue</a></li><li><li><a href="#" onclick="goToNearbyIssues(event)">Nearby Issues</a></li></li><li><a href="/help">Help / FAQ</a></li><li><a href="/signup">Sign Up</a></li><li><a href="/login">Login</a></li></ul></div>
+                <div class="footer-column"><h3>Contact Us</h3><ul class="footer-links"><li><a href="tel:1800CITYHELP"><i class="fas fa-phone"></i> 91+ 9876543210</a></li><li><a href="mailto:support@civicconnect.gov"><i class="fas fa-envelope"></i> civicconnect@gmail.com</a></li></ul></div>
+            </div>
+            <div class="copyright">© 2026 CivicConnect — public service, transparent reporting</div>
+        </div>
+    </footer>
+
+    <script>
+        // Constants
+        const ALLOWED_PINCODES = ['574201','574202','574203','574200'];
+        const PUTTUR_CENTER = [13.3119, 75.2705];
+        
+        // Global variables - SINGLE DECLARATION
+        let map, marker;
+        let isLocationValid = false;
+
+        // Page Routing
+        function showPage(pageId) {
+            if (pageId === "report-page" && !isUserLoggedIn()) {
+                alert("Please login first.");
+                window.location.href = "/login";
+                return;
+            }
+
+            if (pageId === "report-page") {
+                isLocationValid = false;
+                const latInput = document.getElementById("location-lat");
+                const lngInput = document.getElementById("location-lng");
+                const locInput = document.getElementById("issue-location");
+                if (latInput) latInput.value = "";
+                if (lngInput) lngInput.value = "";
+                if (locInput) {
+                    locInput.value = "";
+                    locInput.style.borderColor = "var(--gray-light)";
+                    locInput.style.backgroundColor = "white";
+                }
+                const photoInput = document.getElementById("real-photo");
+                if (photoInput) photoInput.value = "";
+                const previews = document.getElementById("photo-previews");
+                if (previews) previews.innerHTML = "";
+                const desc = document.getElementById("issue-description");
+                if (desc) desc.value = "";
+                
+                setTimeout(() => {
+                    if (map) {
+                        map.invalidateSize();
+                        map.setView(PUTTUR_CENTER, 13);
+                    } else {
+                        initMap();
+                    }
+                }, 100);
+            }
+
+            const homePage = document.getElementById("home-page");
+            const reportPage = document.getElementById("report-page");
+            const confirmPage = document.getElementById("confirmation-page");
+            
+            if (homePage) homePage.style.display = pageId === "home-page" ? "block" : "none";
+            if (reportPage) reportPage.style.display = pageId === "report-page" ? "block" : "none";
+            if (confirmPage) confirmPage.style.display = pageId === "confirmation-page" ? "block" : "none";
+            
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            if (pageId === 'home-page') {
+                const homeLink = document.querySelector('.nav-links a[href="#"]');
+                if (homeLink) homeLink.classList.add('active');
+            }
+        }
+
+        // Map Functions
+        function initMap() {
+            const mapDiv = document.getElementById('map');
+            if (!mapDiv) return;
+            
+            if (map) {
+                map.remove();
+                map = null;
+            }
+            
+            map = L.map('map').setView(PUTTUR_CENTER, 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            marker = L.marker(PUTTUR_CENTER, { draggable: true }).addTo(map);
+            
+            marker.on('dragend', function(e) {
+                const pos = marker.getLatLng();
+                updateLocationFields(pos.lat, pos.lng);
+                reverseGeocode(pos.lat, pos.lng);
+            });
+
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                updateLocationFields(e.latlng.lat, e.latlng.lng);
+                reverseGeocode(e.latlng.lat, e.latlng.lng);
+            });
+            
+            updateLocationFields(PUTTUR_CENTER[0], PUTTUR_CENTER[1]);
+        }
+
+        function updateLocationFields(lat, lng) {
+            const latInput = document.getElementById('location-lat');
+            const lngInput = document.getElementById('location-lng');
+            if (latInput) latInput.value = lat.toFixed(6);
+            if (lngInput) lngInput.value = lng.toFixed(6);
+        }
+
+        function setMapLocation(lat, lng) {
+            const latInput = document.getElementById("location-lat");
+            const lngInput = document.getElementById("location-lng");
+            const locInput = document.getElementById("issue-location");
+            
+            if (latInput) latInput.value = lat;
+            if (lngInput) lngInput.value = lng;
+            if (locInput) locInput.value = `Selected (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+            
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+            map.setView([lat, lng], 16);
+            
+            marker.on('dragend', function(e) {
+                const pos = marker.getLatLng();
+                updateLocationFields(pos.lat, pos.lng);
+                reverseGeocode(pos.lat, pos.lng);
+            });
+            
+            reverseGeocode(lat, lng);
+        }
+
+        window.getCurrentLocation = function(btn) {
+            if (!navigator.geolocation) {
+                alert('Geolocation not supported');
+                return;
+            }
+            
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Detecting...';
+            btn.disabled = true;
+            
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const { latitude, longitude } = pos.coords;
+                    setMapLocation(latitude, longitude);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                },
+                err => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    if (err.code === err.PERMISSION_DENIED) {
+                        alert("Location permission denied. Please enable location access and try again.");
+                    } else {
+                        alert('Unable to retrieve location: ' + err.message);
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        };
+
+        function reverseGeocode(lat, lng) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(r => r.json())
+                .then(data => {
+                    const addr = data.address || {};
+                    const finalAddr = addr.road || addr.suburb || addr.village || addr.town || addr.city || "Unknown Location";
+                    const pincode = addr.postcode || "";
+                    const pincodeInput = document.getElementById("issue-pincode");
+                    if (pincodeInput) pincodeInput.value = pincode;
+                    const displayText = pincode ? `${finalAddr} - ${pincode}` : finalAddr;
+                    
+                    const locInput = document.getElementById("issue-location");
+                    if (locInput) locInput.value = displayText;
+                    
+                    isLocationValid = false;
+                    
+                    if (pincode && ALLOWED_PINCODES.includes(pincode)) {
+                        isLocationValid = true;
+                        if (locInput) {
+                            locInput.style.borderColor = "var(--success)";
+                            locInput.style.backgroundColor = "#f0fdf4";
+                        }
+                    } else {
+                        isLocationValid = false;
+                        if (locInput) {
+                            locInput.style.borderColor = "var(--danger)";
+                            locInput.style.backgroundColor = "#fef2f2";
+                        }
+                        if (pincode) {
+                            alert(`⚠️ Location outside Puttur municipality.\nPincode: ${pincode}\nAllowed: ${ALLOWED_PINCODES.join(", ")}`);
+                        } else {
+                            alert(`⚠️ Could not verify location. Please select a location within Puttur municipality.`);
+                        }
+                        document.getElementById("location-lat").value = "";
+                        document.getElementById("location-lng").value = "";
+                    }
+                })
+                .catch(() => {
+                    isLocationValid = false;
+                    const locInput = document.getElementById("issue-location");
+                    if (locInput) {
+                        locInput.style.borderColor = "var(--danger)";
+                        locInput.style.backgroundColor = "#fef2f2";
+                    }
+                    alert("Could not verify location. Please select a valid location within Puttur municipality.");
+                    document.getElementById("location-lat").value = "";
+                    document.getElementById("location-lng").value = "";
+                });
+        }
+
+        // Photo Preview
+        window.previewPhotos = function(event) {
+            const files = Array.from(event.target.files);
+            const previews = document.getElementById('photo-previews');
+            previews.innerHTML = '';
+            
+            if (files.length > 2) {
+                alert("Maximum 2 photos allowed.");
+                event.target.value = "";
+                return;
+            }
+            
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = "100px";
+                    img.style.height = "100px";
+                    img.style.objectFit = "cover";
+                    img.style.borderRadius = "12px";
+                    img.style.border = "2px solid var(--primary)";
+                    previews.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+                
+                EXIF.getData(file, function() {
+                    const lat = EXIF.getTag(this, "GPSLatitude");
+                    const lng = EXIF.getTag(this, "GPSLongitude");
+                    const latRef = EXIF.getTag(this, "GPSLatitudeRef");
+                    const lngRef = EXIF.getTag(this, "GPSLongitudeRef");
+                    
+                    if (lat && lng) {
+                        const finalLat = convertDMSToDD(lat, latRef);
+                        const finalLng = convertDMSToDD(lng, lngRef);
+                        if (finalLat && finalLng) {
+                            setMapLocation(finalLat, finalLng);
+                        }
+                    }
+                });
+            });
+        };
+
+        function convertDMSToDD(dms, ref) {
+            if (!dms || dms.length < 3) return null;
+            const degrees = dms[0].numerator / dms[0].denominator;
+            const minutes = dms[1].numerator / dms[1].denominator;
+            const seconds = dms[2].numerator / dms[2].denominator;
+            let dd = degrees + (minutes / 60) + (seconds / 3600);
+            if (ref === "S" || ref === "W") dd = dd * -1;
+            return dd;
+        }
+
+        // Submit Issue
+        window.submitIssue = async function() {
+            const lat = document.getElementById("location-lat").value;
+            const lng = document.getElementById("location-lng").value;
+            const photos = document.getElementById("real-photo").files;
+            
+            if (!lat || !lng) {
+                alert("❌ No location selected.\n\nPlease select a valid location on the map.");
+                return;
+            }
+            
+            if (!isLocationValid) {
+                alert("❌ Invalid location.\n\nYou can only submit issues from within Puttur municipality.\n\nAllowed pincodes: " + ALLOWED_PINCODES.join(", "));
+                return;
+            }
+            
+            if (photos.length === 0) {
+                alert("❌ Please upload at least one photo.");
+                return;
+            }
+            
+            const location = document.getElementById("issue-location").value;
+            const description = document.getElementById("issue-description").value;
+            const issuePincode = document.getElementById("issue-pincode").value;
+            
+            // ML Prediction
+            let mlForm = new FormData();
+            mlForm.append("image", photos[0]);
+            
+            let ml;
+            try {
+                const mlRes = await fetch("/predict", { method: "POST", body: mlForm });
+                ml = await mlRes.json();
+            } catch (err) {
+                alert("Cannot connect to ML backend. Please try again later.");
+                return;
+            }
+            
+            const detectedIssue = ml.prediction;
+            const confidence = ml.confidence;
+            const severity = ml.severity_score;
+            
+            if (!detectedIssue) {
+                alert("Could not identify issue type. Please upload a clear photo of a pothole or garbage issue.");
+                return;
+            }
+            
+            const detectedLower = detectedIssue.toLowerCase().trim();
+            if (detectedLower !== "pothole" && detectedLower !== "garbage") {
+                alert(`Invalid image detected: ${detectedIssue}\n\nYou can only submit:\n✓ POTHOLE issues\n✓ GARBAGE issues`);
+                return;
+            }
+            
+            // Prepare submission
+            let formData = new FormData();
+            Array.from(photos).forEach((p, i) => formData.append(`photo_${i + 1}`, p));
+            formData.append("photo_count", photos.length);
+            formData.append("description", description);
+            formData.append("location", location);
+            formData.append("pincode", issuePincode);
+            formData.append("predicted_issue", detectedIssue);
+            formData.append("confidence", confidence);
+            formData.append("severity_score", severity);
+            formData.append("lat", lat);
+            formData.append("lng", lng);
+            formData.append("citizen_name", localStorage.getItem("cc_user_name") || "");
+            formData.append("citizen_email", localStorage.getItem("cc_user_email") || "");
+            formData.append("citizen_phone", localStorage.getItem("cc_user_phone") || "");
+            
+            try {
+                const backendRes = await fetch("/report-issue", { method: "POST", body: formData });
+                const result = await backendRes.json();
+                
+                document.getElementById("detected-issue").innerText = detectedIssue.toUpperCase();
+                
+                const deptIcon = document.getElementById("dept-icon");
+                const deptName = document.getElementById("dept-name");
+                const deptContact = document.getElementById("dept-contact");
+                
+                if (detectedLower === "garbage") {
+                    deptIcon.textContent = "🗑️";
+                    deptName.textContent = "Sanitation & Waste Management Department";
+                    deptContact.textContent = "A sanitation field officer has been assigned.";
+                } else {
+                    deptIcon.textContent = "🛣️";
+                    deptName.textContent = "Roads & Public Works Department";
+                    deptContact.textContent = "A road inspection officer has been assigned.";
+                }
+                
+                document.getElementById("confirmed-location").innerText = location;
+                document.getElementById("complaint-id").innerText = result?.complaint_id || ("#CN-" + Date.now());
+                document.getElementById("submission-time").innerText = new Date().toLocaleString();
+                
+                showPage("confirmation-page");
+            } catch (err) {
+                alert("Backend error. Please try again later.");
+            }
+        };
+
+        // Auth Functions
+        function isUserLoggedIn() {
+            return localStorage.getItem("cc_user_logged_in") === "true";
+        }
+
+        function goToDashboard() {
+            const role = localStorage.getItem('cc_user_role') || 'citizen';
+            const department = (localStorage.getItem('cc_user_department') || '').toLowerCase();
+            if (role === 'officer' && (department.includes('garbage') || department.includes('sanitation'))) {
+                window.location.href = '/garbagereportdashbord';
+            } else if (role === 'officer' && (department.includes('road') || department.includes('pothole'))) {
+                window.location.href = '/potholereportdashbord';
+            } else {
+                window.location.href = '/userdashborad';
+            }
+        }
+
+        function updateUserActions() {
+            const guest = document.getElementById('user-actions-guest');
+            const auth = document.getElementById('user-actions-auth');
+            const emailEl = document.getElementById('user-email');
+            const profileBtn = document.getElementById('profile-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            if (isUserLoggedIn()) {
+                if (guest) guest.style.display = 'none';
+                if (auth) auth.style.display = 'flex';
+                const email = localStorage.getItem('cc_user_email') || 'Account';
+                if (emailEl) {
+                    emailEl.textContent = email;
+                    emailEl.onclick = goToDashboard;
+                }
+                if (profileBtn) profileBtn.onclick = goToDashboard;
+                if (logoutBtn) {
+                    logoutBtn.onclick = () => {
+                        if (!confirm('Are you sure you want to logout?')) return;
+                        localStorage.removeItem('cc_user_logged_in');
+                        localStorage.removeItem('cc_user_email');
+                        localStorage.removeItem('cc_user_role');
+                        updateUserActions();
+                        window.location.href = '/';
+                    };
+                }
+            } else {
+                if (guest) guest.style.display = 'flex';
+                if (auth) auth.style.display = 'none';
+            }
+        }
+        //Nearby issue
+       function goToNearbyIssues(event) {
+            if (event) event.preventDefault();
+
+            if (!isUserLoggedIn()) {
+                alert("Please login first to view nearby issues.");
+                window.location.href = "/login";
+                return;
+            }
+
+            window.location.href = "/nearbyissue";
+        }
+        // Initialize
+        document.addEventListener("DOMContentLoaded", () => {
+            updateUserActions();
+            showPage("home-page");
+            initMap();
+        });
+    </script>
+</body>
+</html>
